@@ -1,18 +1,52 @@
 # CURRENT TEST FILE AND MVP (Minimum viable product), NOT PRODUCTION AND NOT USABLE
 
-import datetime
-import time
-
-import pypresence
 from time import sleep
-from pypresence import Presence, Client
 
-client_id = '978056128967618641'
-RPC = Client(client_id)
-RPC.start()
-RPC.set_activity(7908,state="Free, I can do stuff now",details="Free")
-while True:
-    sleep(120)
-# sleep(60)
-# RPC.clear_activity()
-sleep(15)
+import pypresence.exceptions
+from pypresence import Presence, Client
+from win32gui import GetWindowText, GetForegroundWindow
+
+
+def updateDiscordPresence():
+    status_state = GetWindowText(GetForegroundWindow())
+    status_state = exceptions(status_state)
+
+    try:
+        RPC.set_activity(7908, state=status_state, details="Testing, dont look lol", small_text="testing small text",
+                         small_image="https://static.onecms.io/wp-content/uploads/sites/28/2017/05/blue0517.jpg")
+    except pypresence.exceptions.ServerError:
+        RPC.set_activity(7908, state="Error: Current foreground window name too long", details="Testing, dont look lol",
+                         small_text="testing small text",
+                         small_image="https://static.onecms.io/wp-content/uploads/sites/28/2017/05/blue0517.jpg")
+
+    return status_state
+
+def exceptions(status_state):  # will def change this later
+    # print("Before exception", status_state)
+    if "Brave" in status_state:
+        status_state = "Brave Browser"
+
+    if "Discord" in status_state and not "py" in status_state:
+        status_state = "Discord"
+
+    return status_state
+
+
+def sleepAndWarn():
+    sleep(10)
+    secondCounter = 5
+    for x in range(5):
+        print(f'Updating in {secondCounter} seconds')
+        secondCounter = secondCounter - 1
+        sleep(1)
+
+if __name__ == '__main__':
+    sleep(2)
+    client_id = '978056128967618641'
+    RPC = Client(client_id)
+    RPC.start()
+    print(updateDiscordPresence())
+
+    while True:
+        sleepAndWarn()
+        print(updateDiscordPresence())
